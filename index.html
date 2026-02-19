@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Saver</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { padding: 10px 20px; margin-bottom: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { background: #f0f0f0; margin: 5px 0; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Contact Saver</h1>
+  <button id="shareContactBtn">Share Contact</button>
+
+  <h2>Saved Contacts:</h2>
+  <ul id="contactList"></ul>
+
+  <script>
+    const shareBtn = document.getElementById('shareContactBtn');
+    const contactList = document.getElementById('contactList');
+
+    // Load contacts from localStorage
+    let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    renderContacts();
+
+    shareBtn.addEventListener('click', async () => {
+      // Check if the Contacts API is supported
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['name', 'email', 'tel'];
+          const opts = { multiple: false };
+          const [contact] = await navigator.contacts.select(props, opts);
+
+          if (contact) {
+            contacts.push(contact);
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+            renderContacts();
+          }
+        } catch (err) {
+          alert('Contact sharing cancelled or not supported.');
+          console.error(err);
+        }
+      } else {
+        alert('Contacts API not supported in this browser.');
+      }
+    });
+
+    function renderContacts() {
+      contactList.innerHTML = '';
+      contacts.forEach(c => {
+        const name = c.name ? c.name[0] : 'No Name';
+        const email = c.email ? c.email[0] : 'No Email';
+        const tel = c.tel ? c.tel[0] : 'No Phone';
+        const li = document.createElement('li');
+        li.textContent = `Name: ${name}, Email: ${email}, Phone: ${tel}`;
+        contactList.appendChild(li);
+      });
+    }
+  </script>
+
+</body>
+</html>
