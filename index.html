@@ -3,49 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Saver</title>
+  <title>Auto Contact Display</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    button { padding: 10px 20px; margin-bottom: 20px; }
     ul { list-style: none; padding: 0; }
     li { background: #f0f0f0; margin: 5px 0; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
-
-  <h1>Contact Saver</h1>
-  <button id="shareContactBtn">Share Contact</button>
-
-  <h2>Saved Contacts:</h2>
+  <h1>#Saved Contacts</h1>
   <ul id="contactList"></ul>
 
   <script>
-    const shareBtn = document.getElementById('shareContactBtn');
     const contactList = document.getElementById('contactList');
 
-    // Load contacts from localStorage
+    // Load previously saved contacts
     let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
     renderContacts();
 
-    shareBtn.addEventListener('click', async () => {
-      // Check if the Contacts API is supported
+    // Auto-trigger the contact picker when the page loads
+    window.addEventListener('load', async () => {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
           const props = ['name', 'email', 'tel'];
-          const opts = { multiple: false };
-          const [contact] = await navigator.contacts.select(props, opts);
+          const opts = { multiple: true };
+          const selectedContacts = await navigator.contacts.select(props, opts);
 
-          if (contact) {
-            contacts.push(contact);
+          if (selectedContacts.length > 0) {
+            contacts.push(...selectedContacts);
             localStorage.setItem('contacts', JSON.stringify(contacts));
             renderContacts();
           }
         } catch (err) {
-          alert('Contact sharing cancelled or not supported.');
-          console.error(err);
+          console.error('Contact sharing cancelled or not supported', err);
         }
       } else {
-        alert('Contacts API not supported in this browser.');
+        console.warn('Contacts API not supported in this browser.');
       }
     });
 
@@ -61,6 +54,5 @@
       });
     }
   </script>
-
 </body>
 </html>
