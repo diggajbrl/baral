@@ -3,26 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto Contact Display</title>
+  <title>Contact Display with Button</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
+    button { padding: 10px 20px; margin-bottom: 20px; }
     ul { list-style: none; padding: 0; }
     li { background: #f0f0f0; margin: 5px 0; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
-  <h1>#Saved Contacts</h1>
+  <h1>Saved Contacts</h1>
+  <button id="allowContactsBtn">Allow Contacts Access</button>
   <ul id="contactList"></ul>
 
   <script>
     const contactList = document.getElementById('contactList');
+    const allowBtn = document.getElementById('allowContactsBtn');
 
-    // Load previously saved contacts
+    // Load saved contacts
     let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
     renderContacts();
 
-    // Auto-trigger the contact picker when the page loads
-    window.addEventListener('load', async () => {
+    allowBtn.addEventListener('click', async () => {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
           const props = ['name', 'email', 'tel'];
@@ -38,7 +40,7 @@
           console.error('Contact sharing cancelled or not supported', err);
         }
       } else {
-        console.warn('Contacts API not supported in this browser.');
+        alert('Contacts API not supported in this browser.');
       }
     });
 
